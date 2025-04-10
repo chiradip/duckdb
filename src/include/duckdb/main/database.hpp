@@ -52,7 +52,7 @@ public:
 	DUCKDB_API SecretManager &GetSecretManager();
 	DUCKDB_API BufferManager &GetBufferManager();
 	DUCKDB_API const BufferManager &GetBufferManager() const;
-	DUCKDB_API DatabaseManager &GetDatabaseManager();
+	DUCKDB_API DatabaseManager &GetDatabaseManager() const;
 	DUCKDB_API FileSystem &GetFileSystem();
 	DUCKDB_API TaskScheduler &GetScheduler();
 	DUCKDB_API ObjectCache &GetObjectCache();

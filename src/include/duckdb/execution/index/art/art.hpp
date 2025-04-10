@@ -151,15 +151,15 @@ private:
 	bool ConstructInternal(const unsafe_vector<ARTKey> &keys, const unsafe_vector<ARTKey> &row_ids, Node &node,
 	                       ARTKeySection &section);
 
-	void InitializeMerge(unsafe_vector<idx_t> &upper_bounds);
+	void InitializeMerge(unsafe_vector<idx_t> &upper_bounds) const;
 
-	void InitializeVacuum(unordered_set<uint8_t> &indexes);
-	void FinalizeVacuum(const unordered_set<uint8_t> &indexes);
+	void InitializeVacuum(unordered_set<uint8_t> &indexes) const;
+	void FinalizeVacuum(const unordered_set<uint8_t> &indexes) const;
 
-	void InitAllocators(const IndexStorageInfo &info);
+	void InitAllocators(const IndexStorageInfo &info) const;
 	void TransformToDeprecated();
 	void Deserialize(const BlockPointer &pointer);
-	void WritePartialBlocks(const bool v1_0_0_storage);
+	void WritePartialBlocks(const bool v1_0_0_storage) const;
 	void SetPrefixCount(const IndexStorageInfo &info);
 
 	string VerifyAndToStringInternal(const bool only_verify);

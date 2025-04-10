@@ -1,8 +1,6 @@
 #include "duckdb/execution/index/art/art.hpp"
 
 #include "duckdb/common/types/conflict_manager.hpp"
-#include "duckdb/common/unordered_map.hpp"
-#include "duckdb/common/vector_operations/vector_operations.hpp"
 #include "duckdb/execution/expression_executor.hpp"
 #include "duckdb/execution/index/art/art_key.hpp"
 #include "duckdb/execution/index/art/base_leaf.hpp"
@@ -1285,7 +1283,7 @@ IndexStorageInfo ART::GetStorageInfo(const case_insensitive_map_t<Value> &option
 	return info;
 }
 
-void ART::WritePartialBlocks(const bool v1_0_0_storage) {
+void ART::WritePartialBlocks(const bool v1_0_0_storage) const {
 	auto &block_manager = table_io_manager.GetIndexBlockManager();
 	PartialBlockManager partial_block_manager(block_manager, PartialBlockType::FULL_CHECKPOINT);
 
@@ -1296,7 +1294,7 @@ void ART::WritePartialBlocks(const bool v1_0_0_storage) {
 	partial_block_manager.FlushPartialBlocks();
 }
 
-void ART::InitAllocators(const IndexStorageInfo &info) {
+void ART::InitAllocators(const IndexStorageInfo &info) const {
 	for (idx_t i = 0; i < info.allocator_infos.size(); i++) {
 		(*allocators)[i]->Init(info.allocator_infos[i]);
 	}
@@ -1357,7 +1355,7 @@ idx_t ART::GetInMemorySize(IndexLock &index_lock) {
 // Vacuum
 //===--------------------------------------------------------------------===//
 
-void ART::InitializeVacuum(unordered_set<uint8_t> &indexes) {
+void ART::InitializeVacuum(unordered_set<uint8_t> &indexes) const {
 	for (idx_t i = 0; i < allocators->size(); i++) {
 		if ((*allocators)[i]->InitializeVacuum()) {
 			indexes.insert(NumericCast<uint8_t>(i));
@@ -1365,7 +1363,7 @@ void ART::InitializeVacuum(unordered_set<uint8_t> &indexes) {
 	}
 }
 
-void ART::FinalizeVacuum(const unordered_set<uint8_t> &indexes) {
+void ART::FinalizeVacuum(const unordered_set<uint8_t> &indexes) const {
 	for (const auto &idx : indexes) {
 		(*allocators)[idx]->FinalizeVacuum();
 	}
@@ -1401,7 +1399,7 @@ void ART::Vacuum(IndexLock &state) {
 // Merging
 //===--------------------------------------------------------------------===//
 
-void ART::InitializeMerge(unsafe_vector<idx_t> &upper_bounds) {
+void ART::InitializeMerge(unsafe_vector<idx_t> &upper_bounds) const {
 	D_ASSERT(owns_data);
 	for (auto &allocator : *allocators) {
 		upper_bounds.emplace_back(allocator->GetUpperBoundBufferId());

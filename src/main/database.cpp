@@ -23,7 +23,6 @@
 #include "duckdb/storage/object_cache.hpp"
 #include "duckdb/storage/standard_buffer_manager.hpp"
 #include "duckdb/storage/storage_extension.hpp"
-#include "duckdb/storage/storage_manager.hpp"
 #include "duckdb/transaction/transaction_manager.hpp"
 #include "duckdb/main/capi/extension_api.hpp"
 #include "duckdb/storage/compression/empty_validity.hpp"
@@ -111,7 +110,7 @@ const DatabaseInstance &DatabaseInstance::GetDatabase(const ClientContext &conte
 	return *context.db;
 }
 
-DatabaseManager &DatabaseInstance::GetDatabaseManager() {
+DatabaseManager &DatabaseInstance::GetDatabaseManager() const {
 	if (!db_manager) {
 		throw InternalException("Missing DB manager");
 	}
@@ -143,7 +142,7 @@ ClientConfig &ClientConfig::GetConfig(ClientContext &context) {
 }
 
 DBConfig &DBConfig::Get(AttachedDatabase &db) {
-	return DBConfig::GetConfig(db.GetDatabase());
+	return GetConfig(db.GetDatabase());
 }
 
 const DBConfig &DBConfig::GetConfig(const DatabaseInstance &db) {
@@ -200,11 +199,10 @@ void DatabaseInstance::CreateMainDatabase() {
 	info.name = AttachedDatabase::ExtractDatabaseName(config.options.database_path, GetFileSystem());
 	info.path = config.options.database_path;
 
-	optional_ptr<AttachedDatabase> initial_database;
 	Connection con(*this);
 	con.BeginTransaction();
-	AttachOptions options(config.options);
-	initial_database = db_manager->AttachDatabase(*con.context, info, options);
+	const AttachOptions options(config.options);
+	optional_ptr<AttachedDatabase> initial_database = db_manager->AttachDatabase(*con.context, info, options);
 
 	initial_database->SetInitialDatabase();
 	initial_database->Initialize(*con.context);
